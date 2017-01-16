@@ -1,0 +1,7 @@
+.droidres/
+.DS_Store
+packages/
+bin/
+obj/
+*/bin/
+*/obj/

@@ -1,0 +1,21 @@
+﻿<Properties StartupConfiguration="{B2774245-0F2D-4B82-9B54-CEDA9099883D}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="CodeMaid.Common/Orderer.cs">
+    <Files>
+      <File FileName="CodeMaid.Common/Orderer.cs" Line="23" Column="98" />
+      <File FileName="CodeMaid.Tests/OrderingTests.cs" Line="54" Column="62" />
+    </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="CodeCleaner" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.CodeCleaner PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
