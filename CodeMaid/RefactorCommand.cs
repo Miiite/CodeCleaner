@@ -18,6 +18,7 @@ using ISymbol = Microsoft.CodeAnalysis.ISymbol;
 using SymbolKind = Microsoft.CodeAnalysis.SymbolKind;
 using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 using CodeCleaner.Common.Ordering;
+using System.Diagnostics;
 
 namespace CodeCleaner
 {
@@ -55,8 +56,11 @@ namespace CodeCleaner
                 foreach (var c in classes)
                 {
                     var classMembers = c.GetMembers();
+                    SyntaxNode classSyntaxNode = c.DeclaringSyntaxReferences
+                                           .First()
+                                           .GetSyntax();
 
-                    this.HandleConstants(editor, classMembers);
+                    this.HandleOrdering(editor, classSyntaxNode, classMembers);
 
                     //var cMembers = classMembers
                     //    .OrderBy(m => m.Kind)
@@ -100,16 +104,34 @@ namespace CodeCleaner
             }
         }
 
-        private void HandleConstants(DocumentEditor editor, ImmutableArray<ISymbol> classMembers)
+        private void HandleOrdering(DocumentEditor editor, SyntaxNode classNode, ImmutableArray<ISymbol> classMembers)
         {
             var orderer = new Orderer();
-            var orderedMembers = orderer.OrderConstants(classMembers);
+            var orderedMembers = orderer.OrderAll(classMembers);
+            var nodes = orderedMembers.Select(o => o.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax())
+                                      .Where(node => node != null)
+                                      .ToList();
+
+            foreach (var member in nodes)
+            {
+                try
+                {
+                    editor.RemoveNode(member);
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            }
+
+            editor.InsertMembers(classNode, 0, nodes);
         }
 
         private async System.Threading.Tasks.Task SaveDocument(Microsoft.CodeAnalysis.Document newDocument)
         {
             IdeApp.Workbench.ActiveDocument.Editor.Text = (await newDocument.GetTextAsync()).ToString();
-            //await IdeApp.Workbench.ActiveDocument.Save();
+            await IdeApp.Workbench.ActiveDocument.Save();
         }
 
         protected override void Update(CommandInfo info)

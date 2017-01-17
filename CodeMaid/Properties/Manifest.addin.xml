@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionModel>
 	<Extension path="/MonoDevelop/Ide/Commands/Edit">
-		<Command id="CodeMaid.RefactorCommand" _label="CodeMaid cleanup" _description="Codemaid magic" defaultHandler="CodeMaid.RefactorCommand" />
+		<Command id="CodeCleaner.RefactorCommand" _label="CodeCleaner cleanup" _description="CodeCleaner magic" defaultHandler="CodeCleaner.RefactorCommand" />
 	</Extension>
 	<Extension path="/MonoDevelop/Ide/MainMenu/Edit">
-		<CommandItem id="CodeMaid.RefactorCommand" />
+		<CommandItem id="CodeCleaner.RefactorCommand" />
 	</Extension>
 </ExtensionModel>

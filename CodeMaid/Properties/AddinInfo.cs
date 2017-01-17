@@ -3,14 +3,14 @@ using Mono.Addins;
 using Mono.Addins.Description;
 
 [assembly: Addin(
-    "CodeMaid",
-    Namespace = "CodeMaid",
+    "CodeCleaner",
+    Namespace = "CodeCleaner",
     Version = "1.0"
 )]
 
-[assembly: AddinName("CodeMaid")]
+[assembly: AddinName("CodeCleaner")]
 [assembly: AddinCategory("IDE extensions")]
-[assembly: AddinDescription("CodeMaid")]
+[assembly: AddinDescription("CodeCleaner")]
 [assembly: AddinAuthor("Adrien")]
 
 [assembly: AddinDependency("::MonoDevelop.Core", MonoDevelop.BuildInfo.Version)]

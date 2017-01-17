@@ -15,19 +15,42 @@ namespace CodeCleaner.Common.Ordering
         {
             var result = new List<ISymbol>();
 
-            result.AddRange(this.OrderStaticMembers(symbols));
             result.AddRange(this.OrderConstants(symbols));
-            //result.AddRange(this.OrderInstanceVariables(symbols));
-            //result.AddRange(this.OrderConstructor(symbols));
+            result.AddRange(this.OrderStaticMembers(symbols));
+            result.AddRange(this.OrderInstanceVariables(symbols));
             result.AddRange(this.OrderProperties(symbols));
+            result.AddRange(this.OrderConstructors(symbols));
             result.AddRange(this.OrderMethods(symbols));
+
+            return result;
+        }
+
+        public IList<ISymbol> OrderConstructors(IEnumerable<ISymbol> symbols)
+        {
+            var constructors = symbols.Where(s => s is IMethodSymbol &&
+                                             ((IMethodSymbol)s).MethodKind == MethodKind.Constructor &&
+                                             !((IMethodSymbol)s).IsStatic &&
+                                            !((IMethodSymbol)s).IsImplicitlyDeclared)
+                                      .ToList();
+            var result = new List<ISymbol>();
+
+            result.AddRange(constructors.Where(c => c.DeclaredAccessibility == Accessibility.Public)
+                            .OrderBy(c => ((IMethodSymbol)c).Parameters.Count()));
+            result.AddRange(constructors.Where(c => c.DeclaredAccessibility == Accessibility.Internal)
+                            .OrderBy(c => ((IMethodSymbol)c).Parameters.Count()));
+            result.AddRange(constructors.Where(c => c.DeclaredAccessibility == Accessibility.Protected)
+                            .OrderBy(c => ((IMethodSymbol)c).Parameters.Count()));
+            result.AddRange(constructors.Where(c => c.DeclaredAccessibility == Accessibility.Private)
+                            .OrderBy(c => ((IMethodSymbol)c).Parameters.Count()));
 
             return result;
         }
 
         public IList<ISymbol> OrderInstanceVariables(IEnumerable<ISymbol> symbols)
         {
-            var fields = symbols.Where(s => s is IFieldSymbol);
+            var fields = symbols.Where(s => s is IFieldSymbol &&
+                                      !((IFieldSymbol)s).IsStatic &&
+                                       !((IFieldSymbol)s).IsImplicitlyDeclared);
 
             return OrderSymbols(fields);
         }
@@ -53,7 +76,8 @@ namespace CodeCleaner.Common.Ordering
             }
 
             var staticMethods = symbols.Where(m => m is IMethodSymbol &&
-                                              ((IMethodSymbol)m).IsStatic);
+                                              ((IMethodSymbol)m).IsStatic &&
+                                             ((IMethodSymbol)m).MethodKind == MethodKind.Ordinary);
 
             if (staticMethods.Any())
             {
@@ -66,7 +90,8 @@ namespace CodeCleaner.Common.Ordering
         public IList<ISymbol> OrderMethods(IEnumerable<ISymbol> symbols)
         {
             var methods = symbols.Where(m => m is IMethodSymbol &&
-                                        ((IMethodSymbol)m).MethodKind == MethodKind.Ordinary);
+                                        ((IMethodSymbol)m).MethodKind == MethodKind.Ordinary &&
+                                        !((IMethodSymbol)m).IsStatic);
 
             return OrderSymbols(methods);
         }
