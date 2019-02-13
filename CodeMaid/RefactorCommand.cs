@@ -19,6 +19,7 @@ using SymbolKind = Microsoft.CodeAnalysis.SymbolKind;
 using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 using CodeCleaner.Common.Ordering;
 using System.Diagnostics;
+using MonoDevelop.Ide.TypeSystem;
 
 namespace CodeCleaner
 {
@@ -50,7 +51,7 @@ namespace CodeCleaner
                 var currentNamespace = members.Where(m => m.IsDefinition)
                                               .FirstOrDefault();
 
-                var classes = currentNamespace.GetTypeMembers();
+                var classes = currentNamespace.GetAllTypes().ToList();
                 var editor = await DocumentEditor.CreateAsync(document);
 
                 foreach (var c in classes)
