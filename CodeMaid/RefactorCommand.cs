@@ -20,6 +20,7 @@ using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 using CodeCleaner.Common.Ordering;
 using System.Diagnostics;
 using MonoDevelop.Ide.TypeSystem;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace CodeCleaner
 {
@@ -62,42 +63,11 @@ namespace CodeCleaner
                                            .GetSyntax();
 
                     this.HandleOrdering(editor, classSyntaxNode, classMembers);
-
-                    //var cMembers = classMembers
-                    //    .OrderBy(m => m.Kind)
-                    //    .Where(m => m.Kind == Microsoft.CodeAnalysis.SymbolKind.Method &&
-                    //           m.Kind != Microsoft.CodeAnalysis.SymbolKind.Property &&
-                    //           !m.IsStatic)
-                    //    .OrderBy(m => m.DeclaredAccessibility);
-
-
-                    //var membersToAdd = cMembers.Where(m => m.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public)
-                    //                           .ToList();
-                    //membersToAdd.AddRange(cMembers.Where(m => m.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Protected));
-                    //membersToAdd.AddRange(cMembers.Where(m => m.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Private));
-
-                    //var methods = membersToAdd.Select(m => m.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax())
-                    //                .Where(m => m != null)
-                    //                .ToList();
-
-                    //// Delete previous nodes
-                    //foreach (var method in methods)
-                    //{
-                    //    editor.RemoveNode(method);
-                    //}
-
-                    //SyntaxNode classSyntaxNode = c.DeclaringSyntaxReferences
-                    //                       .First()
-                    //                       .GetSyntax();
-
-                    //// Add the nodes ordered properly
-                    //editor.InsertMembers(classSyntaxNode,
-                    //                     0,
-                    //                     methods);
-
                 }
 
-                await this.SaveDocument(editor.GetChangedDocument());
+                var newDocument = editor.GetChangedDocument();
+                var formatedDocument = await Formatter.FormatAsync(newDocument);
+                await this.SaveDocument(formatedDocument);
             }
             catch (Exception ex)
             {
@@ -112,6 +82,7 @@ namespace CodeCleaner
             var nodes = orderedMembers.Select(o => o.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax())
                                       .Where(node => node != null)
                                       .ToList();
+
 
             foreach (var member in nodes)
             {
@@ -132,7 +103,7 @@ namespace CodeCleaner
         private async System.Threading.Tasks.Task SaveDocument(Microsoft.CodeAnalysis.Document newDocument)
         {
             IdeApp.Workbench.ActiveDocument.Editor.Text = (await newDocument.GetTextAsync()).ToString();
-            await IdeApp.Workbench.ActiveDocument.Save();
+            //await IdeApp.Workbench.ActiveDocument.Save();
         }
 
         protected override void Update(CommandInfo info)
