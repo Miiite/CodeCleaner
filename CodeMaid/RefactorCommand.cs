@@ -83,7 +83,6 @@ namespace CodeCleaner
                                       .Where(node => node != null)
                                       .ToList();
 
-
             foreach (var member in nodes)
             {
                 try
@@ -96,6 +95,8 @@ namespace CodeCleaner
                     Debug.WriteLine(ex.ToString());
                 }
             }
+
+            nodes[1] = nodes[1].WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
 
             editor.InsertMembers(classNode, 0, nodes);
         }

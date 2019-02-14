@@ -9,3 +9,4 @@ obj/
 .vs/
 *.userprefs
 CodeMaid/CodeCleaner.csproj.user
+CodeCleaner.userprefs
