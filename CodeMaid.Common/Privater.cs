@@ -5,29 +5,42 @@ using Microsoft.CodeAnalysis;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
+using System.Diagnostics.SymbolStore;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeMaid.Common
 {
-    public class Privater : ICleanerStep
+    public class Privater : ICleanerStep, ISyntaxNodeCleanerStep
     {
         public Privater()
         {
         }
 
-        public IEnumerable<ISymbol> MakePrivatesVisible(IEnumerable<ISymbol> symbols)
+        public SyntaxNode MakePrivatesVisible(IEnumerable<ISymbol> symbols, SyntaxNode classNode)
         {
-            var methods = symbols.GetMethods();
-            foreach (var method in methods)
+            var newClassNode = classNode;
+
+            foreach (var symbol in symbols)
             {
-                if (method.DeclaredAccessibility == Accessibility.Private)
+                if (symbol.DeclaredAccessibility == Accessibility.Private)
                 {
-                    //Console.WriteLine(method.Name + " " + ((ISymbolMethod)method).Modifiers.ToString());
+                    var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+                    var symbolToken = syntax as MethodDeclarationSyntax;
+
+                    if (symbolToken != null &&
+                        symbolToken.Modifiers != null &&
+                        !symbolToken.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword))
+                    {
+                        var newMethodToken = symbolToken.AddModifiers(SyntaxFactory.Token(SyntaxKind.PrivateKeyword));
+
+                        newClassNode = newClassNode.ReplaceNode(symbolToken, newMethodToken);
+                    }
                 }
             }
 
-            return symbols;
+            return newClassNode;
         }
 
-        public IEnumerable<ISymbol> Run(IEnumerable<ISymbol> symbols) => this.MakePrivatesVisible(symbols);
+        public SyntaxNode Run(IEnumerable<ISymbol> symbols, SyntaxNode classNode) => this.MakePrivatesVisible(symbols, classNode);
     }
 }

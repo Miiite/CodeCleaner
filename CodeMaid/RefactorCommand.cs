@@ -22,22 +22,21 @@ using System.Diagnostics;
 using MonoDevelop.Ide.TypeSystem;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Threading.Tasks;
+using CodeMaid.Common;
 
 namespace CodeCleaner
 {
     public class RefactorCommand : CommandHandler
     {
+        private static ICleanerStep[] Steps = new ICleanerStep[] { new Privater() };
+
         //Ordre:
 
         //Constants
         //Static
-
         //variables
-
         //properties
-
         //constructor
-
         //methods
 
         protected override async void Run()
@@ -63,7 +62,17 @@ namespace CodeCleaner
                                            .First()
                                            .GetSyntax();
 
-                    this.HandleOrdering(editor, classSyntaxNode, classMembers);
+                    foreach (var step in Steps)
+                    {
+                        if (step is ISymbolCleanerStep)
+                        {
+                            this.HandleStep(((ISymbolCleanerStep)step), editor, classSyntaxNode, classMembers);
+                        }
+                        else if (step is ISyntaxNodeCleanerStep)
+                        {
+                            editor.ReplaceNode(classSyntaxNode, ((ISyntaxNodeCleanerStep)step).Run(classMembers, classSyntaxNode));
+                        }
+                    }
                 }
 
                 var newDocument = editor.GetChangedDocument();
@@ -76,11 +85,12 @@ namespace CodeCleaner
             }
         }
 
-        private void HandleOrdering(DocumentEditor editor, SyntaxNode classNode, ImmutableArray<ISymbol> classMembers)
+        private void HandleStep(ISymbolCleanerStep cleanerStep, DocumentEditor editor, SyntaxNode classNode, ImmutableArray<ISymbol> classMembers)
         {
-            var orderer = new Orderer();
-            var orderedMembers = orderer.OrderAll(classMembers);
-            var nodes = orderedMembers.Select(o => o.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax())
+            var cleanedMembers = cleanerStep.Run(classMembers);
+
+            var nodes = cleanedMembers.Where(o => o.DeclaringSyntaxReferences.Any())
+                                      .Select(o => o.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax())
                                       .Where(node => node != null)
                                       .ToList();
 
@@ -89,7 +99,6 @@ namespace CodeCleaner
                 try
                 {
                     editor.RemoveNode(member);
-
                 }
                 catch (Exception ex)
                 {
@@ -98,20 +107,20 @@ namespace CodeCleaner
             }
 
             editor.InsertMembers(classNode, 0, nodes);
-
         }
 
-        private static Task<Microsoft.CodeAnalysis.Document> GetTransformedDocumentAsync(Microsoft.CodeAnalysis.Document document, SyntaxNode syntaxRoot, SyntaxNode node, SyntaxTriviaList leadingTrivia)
-        {
-            var newTriviaList = leadingTrivia;
-            newTriviaList = newTriviaList.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
 
-            var newNode = node.WithLeadingTrivia(newTriviaList);
-            var newSyntaxRoot = syntaxRoot.ReplaceNode(node, newNode);
-            var newDocument = document.WithSyntaxRoot(newSyntaxRoot);
+        //private static Task<Microsoft.CodeAnalysis.Document> GetTransformedDocumentAsync(Microsoft.CodeAnalysis.Document document, SyntaxNode syntaxRoot, SyntaxNode node, SyntaxTriviaList leadingTrivia)
+        //{
+        //    var newTriviaList = leadingTrivia;
+        //    newTriviaList = newTriviaList.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
 
-            return Task.FromResult(newDocument);
-        }
+        //    var newNode = node.WithLeadingTrivia(newTriviaList);
+        //    var newSyntaxRoot = syntaxRoot.ReplaceNode(node, newNode);
+        //    var newDocument = document.WithSyntaxRoot(newSyntaxRoot);
+
+        //    return Task.FromResult(newDocument);
+        //}
 
 
         private async System.Threading.Tasks.Task SaveDocument(Microsoft.CodeAnalysis.Document newDocument)

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeMaid.Common;
 using Microsoft.CodeAnalysis;
 
 namespace CodeCleaner.Common.Ordering
 {
-    public class Orderer
+    public class Orderer : ICleanerStep, ISymbolCleanerStep
     {
         public Orderer()
         {
@@ -118,5 +119,7 @@ namespace CodeCleaner.Common.Ordering
 
             return result;
         }
+
+        public IEnumerable<ISymbol> Run(IEnumerable<ISymbol> symbols) => this.OrderAll(symbols);
     }
 }

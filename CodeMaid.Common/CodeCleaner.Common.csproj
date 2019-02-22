@@ -77,6 +77,7 @@
     <Compile Include="Privater.cs" />
     <Compile Include="SymbolExtensions.cs" />
     <Compile Include="ICleanerStep.cs" />
+    <Compile Include="Enums.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

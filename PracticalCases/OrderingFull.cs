@@ -11,10 +11,10 @@ namespace CodeCleaner.Tests
     public class Test
     {
         int c = 0;
-        object a = null; 
+        object a = null;
         int d;
-        string b = "b"; 
-        
+        string b = "b";
+
         internal string PropB
         {
             get
@@ -33,8 +33,8 @@ namespace CodeCleaner.Tests
 
         private static object StaticA = null;
         public static string StaticZ = "";
-        
-        private const int bconst = 42;
+
+        const int bconst = 42;
 
         public int PropA
         {
