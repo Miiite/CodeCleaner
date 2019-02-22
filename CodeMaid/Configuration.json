@@ -1,0 +1,15 @@
+﻿{
+    "configuration": {
+        "ordering": {
+            "enabled": true,
+            "orderConstants": true,
+            "orderStatic": true,
+            "orderVariables": true,
+            "orderProperties": true,
+            "orderConstructors": true,
+            "orderMethods": true
+        },
+        "orderingEnabled": true,
+        "accessingEnabled": true
+    }
+}

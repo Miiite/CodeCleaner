@@ -21,6 +21,7 @@ using CodeCleaner.Common.Ordering;
 using System.Diagnostics;
 using MonoDevelop.Ide.TypeSystem;
 using Microsoft.CodeAnalysis.Formatting;
+using System.Threading.Tasks;
 
 namespace CodeCleaner
 {
@@ -96,10 +97,22 @@ namespace CodeCleaner
                 }
             }
 
-            nodes[1] = nodes[1].WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
-
             editor.InsertMembers(classNode, 0, nodes);
+
         }
+
+        private static Task<Microsoft.CodeAnalysis.Document> GetTransformedDocumentAsync(Microsoft.CodeAnalysis.Document document, SyntaxNode syntaxRoot, SyntaxNode node, SyntaxTriviaList leadingTrivia)
+        {
+            var newTriviaList = leadingTrivia;
+            newTriviaList = newTriviaList.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
+
+            var newNode = node.WithLeadingTrivia(newTriviaList);
+            var newSyntaxRoot = syntaxRoot.ReplaceNode(node, newNode);
+            var newDocument = document.WithSyntaxRoot(newSyntaxRoot);
+
+            return Task.FromResult(newDocument);
+        }
+
 
         private async System.Threading.Tasks.Task SaveDocument(Microsoft.CodeAnalysis.Document newDocument)
         {

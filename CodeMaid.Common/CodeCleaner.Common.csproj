@@ -74,6 +74,9 @@
   <ItemGroup>
     <Compile Include="Orderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Privater.cs" />
+    <Compile Include="SymbolExtensions.cs" />
+    <Compile Include="ICleanerStep.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
