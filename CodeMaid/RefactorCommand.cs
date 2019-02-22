@@ -22,6 +22,7 @@ using System.Diagnostics;
 using MonoDevelop.Ide.TypeSystem;
 using Microsoft.CodeAnalysis.Formatting;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.Options;
 
 namespace CodeCleaner
 {
@@ -45,17 +46,10 @@ namespace CodeCleaner
             try
             {
                 var document = IdeApp.Workbench.ActiveDocument.AnalysisDocument;
-                var body = await document.GetSemanticModelAsync();
-                var members = body.Compilation
-                                  .GlobalNamespace
-                                  .GetNamespaceMembers()
-                                  .ToList();
-                var currentNamespace = members.Where(m => m.IsDefinition)
-                                              .FirstOrDefault();
-
-                var classes = currentNamespace.GetAllTypes().ToList();
+                List<INamedTypeSymbol> classes = await GetDocumentClasses(document);
                 var editor = await DocumentEditor.CreateAsync(document);
 
+                Microsoft.CodeAnalysis.Document newDocument = null;
                 foreach (var c in classes)
                 {
                     var classMembers = c.GetMembers();
@@ -66,14 +60,51 @@ namespace CodeCleaner
                     this.HandleOrdering(editor, classSyntaxNode, classMembers);
                 }
 
-                var newDocument = editor.GetChangedDocument();
+                newDocument = editor.GetChangedDocument();
                 var formatedDocument = await Formatter.FormatAsync(newDocument);
-                await this.SaveDocument(formatedDocument);
+
+                //var fClasses = await GetDocumentClasses(formatedDocument);
+
+                //var firstClassNode = fClasses.First().DeclaringSyntaxReferences.First().GetSyntax();
+                //var lastConstantTrivia = Orderer.Symbols.LastConstant.GetTrailingTrivia();
+                //lastConstantTrivia.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
+                //var newFirstClassNode = firstClassNode.ReplaceNode(
+                //    Orderer.Symbols.LastConstant,
+                //    Orderer.Symbols.LastConstant.WithTrailingTrivia(lastConstantTrivia));
+
+                //var root = await formatedDocument.GetSyntaxRootAsync();
+                //var newRoot = root.ReplaceNode(firstClassNode, newFirstClassNode);
+
+                //var yetAnotherDoc = document.WithSyntaxRoot(newRoot);
+                var root = await formatedDocument.GetSyntaxRootAsync();
+
+                var trivia = Orderer.Symbols.LastConstant.GetTrailingTrivia();
+                trivia.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
+                var newLastConstant = Orderer.Symbols.LastConstant.WithTrailingTrivia(trivia);
+                var newRoot = root.ReplaceNode(Orderer.Symbols.LastConstant, newLastConstant);
+
+                var yetAnotherDoc = document.WithSyntaxRoot(newRoot);
+
+                await this.SaveDocument(yetAnotherDoc);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        private static async Task<List<INamedTypeSymbol>> GetDocumentClasses(Microsoft.CodeAnalysis.Document document)
+        {
+            var body = await document.GetSemanticModelAsync();
+            var members = body.Compilation
+                              .GlobalNamespace
+                              .GetNamespaceMembers()
+                              .ToList();
+            var currentNamespace = members.Where(m => m.IsDefinition)
+                                          .FirstOrDefault();
+
+            var classes = currentNamespace.GetAllTypes().ToList();
+            return classes;
         }
 
         private void HandleOrdering(DocumentEditor editor, SyntaxNode classNode, ImmutableArray<ISymbol> classMembers)
@@ -101,12 +132,35 @@ namespace CodeCleaner
 
         }
 
+        private async Task<Microsoft.CodeAnalysis.Document> HandleOrdering2(Microsoft.CodeAnalysis.Document document, SyntaxNode classNode, ImmutableArray<ISymbol> classMembers)
+        {
+            var initialChildren = classNode.ChildNodes();
+            var orderer = new Orderer();
+            var orderedMembers = orderer.OrderAll(classMembers);
+            var nodes = orderedMembers.Select(o => o.DeclaringSyntaxReferences.FirstOrDefault().GetSyntax())
+                                      .Where(node => node != null)
+                                      .ToList();
+
+            var editor = await DocumentEditor.CreateAsync(document);
+
+            foreach (var member in initialChildren)
+            {
+                editor.RemoveNode(member);
+            }
+
+            editor.InsertMembers(classNode, 0, nodes);
+            var newDocument = editor.GetChangedDocument();
+
+            return newDocument;
+        }
+
+
         private static Task<Microsoft.CodeAnalysis.Document> GetTransformedDocumentAsync(Microsoft.CodeAnalysis.Document document, SyntaxNode syntaxRoot, SyntaxNode node, SyntaxTriviaList leadingTrivia)
         {
             var newTriviaList = leadingTrivia;
             newTriviaList = newTriviaList.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
 
-            var newNode = node.WithLeadingTrivia(newTriviaList);
+            var newNode = node.WithTrailingTrivia(newTriviaList);
             var newSyntaxRoot = syntaxRoot.ReplaceNode(node, newNode);
             var newDocument = document.WithSyntaxRoot(newSyntaxRoot);
 

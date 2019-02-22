@@ -7,6 +7,18 @@ namespace CodeCleaner.Common.Ordering
 {
     public class Orderer
     {
+        public class LastSymbols
+        {
+            public SyntaxNode LastConstant { get; set; }
+            public SyntaxNode LastStatic { get; set; }
+            public SyntaxNode LastVariable { get; set; }
+            public SyntaxNode LastProperty { get; set; }
+            public SyntaxNode LastConstructor { get; set; }
+            public SyntaxNode LastMethod { get; set; }
+        }
+
+        public static LastSymbols Symbols { get; set; } = new LastSymbols();
+
         public Orderer()
         {
         }
@@ -15,12 +27,35 @@ namespace CodeCleaner.Common.Ordering
         {
             var result = new List<ISymbol>();
 
-            result.AddRange(this.OrderConstants(symbols));
-            result.AddRange(this.OrderStaticMembers(symbols));
-            result.AddRange(this.OrderInstanceVariables(symbols));
-            result.AddRange(this.OrderProperties(symbols));
-            result.AddRange(this.OrderConstructors(symbols));
-            result.AddRange(this.OrderMethods(symbols));
+            this.AddAndSaveLast(result, this.OrderConstants(symbols), (node) => Symbols.LastConstant = node);
+            this.AddAndSaveLast(result, this.OrderStaticMembers(symbols), (node) => Symbols.LastStatic = node);
+            this.AddAndSaveLast(result, this.OrderInstanceVariables(symbols), (node) => Symbols.LastVariable = node);
+            this.AddAndSaveLast(result, this.OrderProperties(symbols), (node) => Symbols.LastProperty = node);
+            this.AddAndSaveLast(result, this.OrderConstructors(symbols), (node) => Symbols.LastConstructor = node);
+            this.AddAndSaveLast(result, this.OrderMethods(symbols), (node) => Symbols.LastMethod = node);
+
+            return result;
+        }
+
+        private IList<ISymbol> AddAndSaveLast(List<ISymbol> sourceList, IEnumerable<ISymbol> symbols, Action<SyntaxNode> saveLastAction)
+        {
+            saveLastAction(this.GetLastNode(symbols));
+            sourceList.AddRange(symbols);
+
+            return sourceList;
+        }
+
+        private SyntaxNode GetLastNode(IEnumerable<ISymbol> symbols)
+        {
+            SyntaxNode result = null;
+
+            if (symbols?.Any() == true)
+            {
+                result = symbols.Last()
+                    .DeclaringSyntaxReferences
+                    .First()
+                    .GetSyntax();
+            }
 
             return result;
         }
