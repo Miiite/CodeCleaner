@@ -28,20 +28,11 @@ namespace CodeCleaner
 {
     public class RefactorCommand : CommandHandler
     {
-        private static ICleanerStep[] Steps = new ICleanerStep[] { new Privater() };
-
-        //Ordre:
-
-        //Constants
-        //Static
-        //variables
-        //properties
-        //constructor
-        //methods
+        private static ICleanerStep[] Steps = new ICleanerStep[] { new Orderer(), new Privater() };
 
         protected override async void Run()
         {
-            try
+            foreach (var step in Steps)
             {
                 var document = IdeApp.Workbench.ActiveDocument.AnalysisDocument;
                 var body = await document.GetSemanticModelAsync();
@@ -62,26 +53,19 @@ namespace CodeCleaner
                                            .First()
                                            .GetSyntax();
 
-                    foreach (var step in Steps)
+                    if (step is ISymbolCleanerStep)
                     {
-                        if (step is ISymbolCleanerStep)
-                        {
-                            this.HandleStep(((ISymbolCleanerStep)step), editor, classSyntaxNode, classMembers);
-                        }
-                        else if (step is ISyntaxNodeCleanerStep)
-                        {
-                            editor.ReplaceNode(classSyntaxNode, ((ISyntaxNodeCleanerStep)step).Run(classMembers, classSyntaxNode));
-                        }
+                        this.HandleStep(((ISymbolCleanerStep)step), editor, classSyntaxNode, classMembers);
+                    }
+                    else if (step is ISyntaxNodeCleanerStep)
+                    {
+                        editor.ReplaceNode(classSyntaxNode, ((ISyntaxNodeCleanerStep)step).Run(classMembers, classSyntaxNode));
                     }
                 }
 
                 var newDocument = editor.GetChangedDocument();
                 var formatedDocument = await Formatter.FormatAsync(newDocument);
                 await this.SaveDocument(formatedDocument);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
             }
         }
 
@@ -108,20 +92,6 @@ namespace CodeCleaner
 
             editor.InsertMembers(classNode, 0, nodes);
         }
-
-
-        //private static Task<Microsoft.CodeAnalysis.Document> GetTransformedDocumentAsync(Microsoft.CodeAnalysis.Document document, SyntaxNode syntaxRoot, SyntaxNode node, SyntaxTriviaList leadingTrivia)
-        //{
-        //    var newTriviaList = leadingTrivia;
-        //    newTriviaList = newTriviaList.Insert(0, SyntaxFactory.CarriageReturnLineFeed);
-
-        //    var newNode = node.WithLeadingTrivia(newTriviaList);
-        //    var newSyntaxRoot = syntaxRoot.ReplaceNode(node, newNode);
-        //    var newDocument = document.WithSyntaxRoot(newSyntaxRoot);
-
-        //    return Task.FromResult(newDocument);
-        //}
-
 
         private async System.Threading.Tasks.Task SaveDocument(Microsoft.CodeAnalysis.Document newDocument)
         {

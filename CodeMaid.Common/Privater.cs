@@ -27,8 +27,7 @@ namespace CodeMaid.Common
                     var syntax = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
                     var symbolToken = syntax as MethodDeclarationSyntax;
 
-                    if (symbolToken != null &&
-                        symbolToken.Modifiers != null &&
+                    if (symbolToken?.Modifiers != null &&
                         !symbolToken.Modifiers.Any(m => m.Kind() == SyntaxKind.PrivateKeyword))
                     {
                         var newMethodToken = symbolToken.AddModifiers(SyntaxFactory.Token(SyntaxKind.PrivateKeyword));

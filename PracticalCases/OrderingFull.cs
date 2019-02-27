@@ -11,7 +11,7 @@ namespace CodeCleaner.Tests
     public class Test
     {
         int c = 0;
-        object a = null;
+        private object a = null;
         int d;
         string b = "b";
 
