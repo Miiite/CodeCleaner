@@ -10,6 +10,9 @@ namespace CodeCleaner.Tests
 {
     public class Test
     {
+        private bool isExplicit;
+        bool isImplicit;
+
         private void IsDeclaredPrivate()
         {
             var tree = "private";
