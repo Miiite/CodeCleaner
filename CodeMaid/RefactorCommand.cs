@@ -59,7 +59,7 @@ namespace CodeCleaner
                     }
                     else if (step is ISyntaxNodeCleanerStep)
                     {
-                        editor.ReplaceNode(classSyntaxNode, ((ISyntaxNodeCleanerStep)step).Run(classMembers, classSyntaxNode));
+                        editor.ReplaceNode(classSyntaxNode, ((ISyntaxNodeCleanerStep)step).Run(classSyntaxNode));
                     }
                 }
 

@@ -33,6 +33,7 @@ namespace CodeCleaner.Tests
 
         private static object StaticA = null;
         public static string StaticZ = "";
+        static object StaticBB = null;
 
         const int bconst = 42;
 
@@ -47,6 +48,11 @@ namespace CodeCleaner.Tests
         private void IsPrivate()
         {
             var tree = "private";
+        }
+
+        void AIsPrivate3()
+        {
+            var tree = "private3";
         }
 
         protected void IsProtected()

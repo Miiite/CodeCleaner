@@ -14,6 +14,6 @@ namespace CodeMaid.Common
 
     public interface ISyntaxNodeCleanerStep
     {
-        SyntaxNode Run(IEnumerable<ISymbol> symbols, SyntaxNode classNode);
+        SyntaxNode Run(SyntaxNode classNode);
     }
 }
