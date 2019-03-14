@@ -28,7 +28,7 @@ namespace CodeCleaner
 {
     public class RefactorCommand : CommandHandler
     {
-        private static ICleanerStep[] Steps = new ICleanerStep[] { new Orderer(), new Privater() };
+        private static ICleanerStep[] Steps = { new Orderer(), new Privater() };
 
         protected override async void Run()
         {

@@ -1,9 +1,29 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ExtensionModel>
-	<Extension path="/MonoDevelop/Ide/Commands/Edit">
-		<Command id="CodeCleaner.RefactorCommand" _label="CodeCleaner cleanup" _description="CodeCleaner magic" defaultHandler="CodeCleaner.RefactorCommand" />
-	</Extension>
-	<Extension path="/MonoDevelop/Ide/MainMenu/Edit">
-		<CommandItem id="CodeCleaner.RefactorCommand" />
-	</Extension>
+    <Extension
+        path="/MonoDevelop/Ide/Commands/Edit">
+        <Command
+            id="CodeCleaner.RefactorCommand"
+            _label="CodeCleaner cleanup"
+            _description="CodeCleaner magic"
+            defaultHandler="CodeCleaner.RefactorCommand" />
+    </Extension>
+    <Extension
+        path="/MonoDevelop/Ide/Commands/Edit">
+        <Command
+            id="CodeCleaner.Configurator"
+            _label="CodeCleaner configuration"
+            _description="CodeCleaner configuration window"
+            defaultHandler="CodeCleaner.ConfigureCommandHandler" />
+    </Extension>
+    <Extension
+        path="/MonoDevelop/Ide/MainMenu/Edit">
+        <CommandItem
+            id="CodeCleaner.RefactorCommand" />
+    </Extension>
+    <Extension
+        path="/MonoDevelop/Ide/MainMenu/Edit">
+        <CommandItem
+            id="CodeCleaner.Configurator" />
+    </Extension>
 </ExtensionModel>

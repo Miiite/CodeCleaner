@@ -10,3 +10,4 @@ obj/
 *.userprefs
 CodeMaid/CodeCleaner.csproj.user
 CodeCleaner.userprefs
+CodeMaid/.DS_Store

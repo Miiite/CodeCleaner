@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCleaner.Tests", "CodeMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCleaner.Common", "CodeMaid.Common\CodeCleaner.Common.csproj", "{ECF39A10-2E5C-4DA0-A187-3E6D8B13CCCE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Configurator", "Configurator\Configurator.csproj", "{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{ECF39A10-2E5C-4DA0-A187-3E6D8B13CCCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECF39A10-2E5C-4DA0-A187-3E6D8B13CCCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECF39A10-2E5C-4DA0-A187-3E6D8B13CCCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

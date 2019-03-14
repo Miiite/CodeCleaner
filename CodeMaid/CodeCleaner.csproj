@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>CodeMaid</RootNamespace>
     <AssemblyName>CodeMaid</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,7 +30,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AddinInfo.cs" />
     <Compile Include="RefactorCommand.cs" />
-    <Compile Include="ClearCommandHandler.cs" />
+    <Compile Include="ConfigureCommandHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />
@@ -42,6 +42,10 @@
     <ProjectReference Include="..\CodeMaid.Common\CodeCleaner.Common.csproj">
       <Project>{ECF39A10-2E5C-4DA0-A187-3E6D8B13CCCE}</Project>
       <Name>CodeCleaner.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Configurator\Configurator.csproj">
+      <Project>{846F341A-9E04-4BE5-A395-4E9F0CB0A24B}</Project>
+      <Name>Configurator</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
